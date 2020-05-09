@@ -1,0 +1,143 @@
+{
+    "INTENTS" : {
+        "get_user_name_Q" : [
+            "What_should_i_call_you_?",
+            "what_is_your_name_?"
+        ],
+        "made_reponses" : [
+            "Yassine Baghdadi made me as a Project of the end of study, and his colleague Maria Frij gave me this name Alex",
+            "its Yassine Baghdadi, and make me able to talk",
+            "its Yassine Baghdadi"
+        ],
+        "commands" : {
+            "what i have for {date'} | my events for {date}" : "get your Events by dates",
+            "send | create | new email" : "send email for you",
+            "search" : "doing a search for you",
+            "tell me a joke" : "tell you jokes (programming jokes)",
+            "open | go to {key | url}" : " open an url on google chrome",
+            "start {Application's name}" : "start an app",
+            "weather of {city}" : "get weather of a city for you",
+            "start | pause | stop Music" : "Music operations",
+            "take picture | photo" : "take pictures",
+            "send SMS" : "send SMS",
+            "exit | bye | goodbye | stop" : " Exit",
+            "shutdown | tur off the computer" : "shutdown the computer"
+        },
+
+        "GREETING": [
+            "hello",
+            "hi",
+            "hay?",
+            "good_to_see_you",
+            "welcome_back"
+        ],"howdy_reponses" : [
+            "i'm_good",
+            "I’m fine",
+            "Pretty good",
+            "I’m well",
+            "Not too bad.",
+            "Very well, thanks",
+            "Oh, just the usual.",
+            "Much better now that you are with me",
+            "Well enough to help you if you wish to"
+        ],
+        "give_help": [
+            "how_can_i_help_you_sir",
+            "how_may_i_help_you_?"
+        ],
+        "wake": [
+            "am_here_sir",
+            "anything?",
+            "hello",
+            "here_is_alex",
+            "hey_sir",
+            "how_can_i_help_you_sir",
+            "how_may_i_help_you_sir_?",
+            "i_am_Happy_to_help",
+            "peek-a-boo",
+            "yes",
+            "yes_sir",
+            "yo_bro",
+            "am_here"
+        ],
+        "GOOD_BYE": [
+            "bye",
+            "see_you",
+            "goodbye_sir",
+            "bye!_come_back_again_soon",
+            "later",
+            "nex_time",
+            "nice_talking,_bye"
+        ],
+        "search": [
+            "for_what_?",
+            "what_do_you_want_to_search_for_?",
+            "what_you_want_to_know_sir_?",
+            "okay_say_search_sentence"
+        ],
+        "UNDERSTAND_ESSUE": [
+            "Sorry,_can't_understand_you",
+            "Please_give_me_more_info",
+            "Not_sure_Iunderstand",
+            "can_you_say_it_again_please"
+        ],
+        "THANK": [
+            "Happy_to_help!",
+            "Any_time?",
+            "My_pleasure"
+        ]
+    },
+    "MONTHS": [
+        "january",
+        "february",
+        "march",
+        "april",
+        "may",
+        "june",
+        "july",
+        "august",
+        "september",
+        "october",
+        "november",
+        "december"
+    ],
+    "DAYS": [
+        "sunday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+    ],
+    "DAYS_EXTENTIONS": [
+        "nd",
+        "st",
+        "rd",
+        "th"
+    ],
+    "INFO": {
+        "USER": {
+            "name": "yassine",
+            "age": "",
+            "email": "yassine.baghdadi.deve@gmail.com",
+            "phone": "+212630504606",
+            "city": "Guercif"
+        },
+        "ASSISTANT": {
+            "name": "alex",
+            "description": [
+                "I'm alex your virtual assistant, am here to help",
+                "my name is alex I'm your assistant, how can i help",
+                "your assistant",
+                "my name is alex, I'm here for you"
+            ],
+            "age": ""
+        }
+    },
+    "test": "yassine",
+    "links": {
+        "google": "https://www.google.com",
+        "youtube": "https://www.youtube.com",
+        "stackoverflow": "https://stackoverflow.com"
+    }
+}
