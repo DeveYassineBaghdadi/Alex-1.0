@@ -6,4 +6,5 @@ python3.6 -m pip playsound
 python3.6 -m pip SpeechRecognition
 python3.6 -m pip gTTS
 python3.6 -m pip install googletrans
+sudo apt-get install scrot
 

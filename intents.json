@@ -29,7 +29,10 @@
             "hi",
             "hay?",
             "good_to_see_you",
-            "welcome_back"
+            "welcome_back",
+            "good morning",
+            "good afternoon",
+            "Good Evening"
         ],"howdy_reponses" : [
             "i'm_good",
             "I’m fine",

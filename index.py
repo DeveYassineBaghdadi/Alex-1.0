@@ -10,6 +10,8 @@
 """
 import os
 import sys
+
+import pyautogui
 import vlc
 import json
 import pytz
@@ -170,17 +172,18 @@ class Main:
         self.welcome()
 
     def welcome(self):
-        hour = int(datetime.datetime.now().hour)
-        if hour >= 0 and hour < 12:
-            gr = "good morning"
-        elif hour >= 12 and hour < 18:
-            gr = "good afternoon"
-        else:
-            gr = "Good Evening"
 
         greeting = self.INTENTS['GREETING']
-        greeting.append(gr)
-        greeting.append('username')
+
+        hour = int(datetime.datetime.now().hour)
+        if hour >= 0 and hour < 12:
+            greeting.pop(greeting.index("good morning"))
+        elif hour >= 12 and hour < 18:
+            greeting.pop(greeting.index("good afternoon"))
+        else:
+            greeting.pop(greeting.index("good Evening"))
+
+
 
         if not self.USER:
             playsound(f'{self.aud_dir}/{random.choice(self.INTENTS["get_user_name_Q"].replace(" ", "_"))}.mp3')
@@ -200,6 +203,7 @@ class Main:
                     return
                 else:
                     playsound(f"{self.aud_dir}/just_the_first_name_please.mp3")
+
         greet = random.choice(greeting)
         g2 = random.choice(self.INTENTS['give_help'])
 
@@ -672,11 +676,13 @@ if __name__ == '__main__':
                             #     'what', '').replace('why', '').replace('how', '').replace('who', '').replace('where',
                             #                                                                                  '').replace(
                             #     'are', '').replace('is', '').replace('for', '').replace('alex', '')
-                            try:
-                                m.wikipedia_search(q)
-                            except:
-                                vlc.MediaPlayer(os.path.join(m.aud_dir, 'Unfortunately_i_did_not_get_a_proved_answer_from_wikipedia,_i_will_try_on_google_search.mp3'.replace(' ', '_'))).play()
-                                m.google_serch(q)
+                            if 'wikipedia' in query:
+                                try:
+                                    m.wikipedia_search(q)
+                                except:
+                                    vlc.MediaPlayer(os.path.join(m.aud_dir, 'Unfortunately_i_did_not_get_a_proved_answer_from_wikipedia,_i_will_try_on_google_search.mp3'.replace(' ', '_'))).play()
+                                    m.google_serch(q)
+                            else: m.google_serch(q)
 
                         elif 'joke' in query:
                             m.joke()
@@ -709,7 +715,7 @@ if __name__ == '__main__':
 
                         elif ('take' in query or 'get' in query) and ('picture' in query or 'photo' in query):
                             [playsound(os.path.join(m.aud_dir, f'{i}.mp3')) for i in [3, 2, 1]]
-                            m.take_pic()
+                            m.take_pic() #todo bug here
                             vlc.MediaPlayer(os.path.join(m.aud_dir, 'pic.mp3')).play()
 
                         elif 'take' in query and 'note' in query:
@@ -734,41 +740,73 @@ if __name__ == '__main__':
                             doit()
                             print(logo)
 
-                    elif 'how you work' in text or 'how do you work' in text or 'how can you help' in text or 'commends' in text or 'your rules' in text or 'the rules' in text or 'help' in text:
-                        commands = m.INTENTS['commands']
 
-                        m.say(f'i can help you with {len(commands)} operations so far :')
-                        for x in commands:
-                            print(f'\t#\t{x.capitalize()} \033[5m==>\033[0m {commands[x].capitalize()} .\n')
 
-                            m.say(commands[x].capitalize(), False)
-                        print()
+                        elif ('what is' in query or 'what\'s' in query or 'what' in query ) and 'time' in query:
+                            m.say(datetime.datetime.now().strftime('%H:%M'))
 
-                        m.say('just say alex and i will be there for you', False)
-                        for i in range(len(commands)):
-                            sys.stdout.write('\x1b[1A')
-                            sys.stdout.write('\x1b[2K')
+                        elif ('what is' in query or 'what\'s' in query or 'what' in query ) and ('date' in query or 'dates' in query):
+                            if 'for' in query or 'in' in query or 'next' in query or 'tomorrow' in query or 'was' in query or 'of' in query:
+                                try:
+                                    p = parsedatetime.Calendar()
+                                    date = p.nlp(query)[0][0].date()
+                                    m.say(date)
+                                except: m.say(f"sorry i can't find this date, but today is {datetime.datetime.now().strftime('%m-%d-%Y')} anyway")
+                            else:m.say(f" {datetime.datetime.now().strftime('%m-%d-%Y')} .")
 
-                    elif  'hi' in text or 'hey' in text or'hey' in text or 'hay' in text or 'hello' in text:
+                        elif ('make' in query or 'take' in query or 'do' in query ) and 'screenshot' in query:
+                            myScr = pyautogui.screenshot()
+                            now = datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
+                            pt = os.path.join(m.PATH, f'alex-screenshot-{now}.png')
+                            myScr.save(pt)
+                            time.sleep(2)
+                            img = Image.open(pt)
+                            img.show()
+
+                        elif 'how you work' in query or 'how do you work' in query or 'how can you help' in query or 'commends' in query or 'your rules' in query or 'the rules' in query or 'help' in query:
+                            commands = m.INTENTS['commands']
+
+                            m.say(f'i can help you with {len(commands)} operations so far :')
+                            for x in commands:
+                                print(f'\t#\t{x.capitalize()} \033[5m==>\033[0m {commands[x].capitalize()} .\n')
+
+                                m.say(commands[x].capitalize(), False)
+                            print()
+
+                            m.say('just say alex and i will be there for you', False)
+                            for i in range(len(commands)):
+                                sys.stdout.write('\x1b[1A')
+                                sys.stdout.write('\x1b[2K')
+
+
+
+                        elif 'created you' in query or 'made you' in query or 'maker name' in query or 'your father' in query:
+                            r = random.choice(m.INTENTS['made_reponses'])
+                            print(f'{m.ASS_NAME} : {r} .')
+                            playsound(os.path.join(m.aud_dir, f'{r.replace(" ", "_")}.mp3'))
+
+
+                        elif 'not funny' in query:
+                            m.say('take this ')
+                            m.joke()
+
+
+                        elif 'refresh' in query or 'reload' in query or 'rebuild' in query :
+                            m.refresh()
+
+                    elif 'hi' in text or 'hey' in text or 'hey' in text or 'hay' in text or 'hello' in text:
                         r = random.choice(m.INTENTS['GREETING'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
                         try:
                             playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
-                        except: m.say(r, False)
-
-                    elif 'created you' in text or 'made you' in text or 'maker name' in text or 'your father' in text:
-                        r = random.choice(m.INTENTS['made_reponses'])
-                        print(f'{m.ASS_NAME} : {r} .')
-                        playsound(os.path.join(m.aud_dir, f'{r.replace(" ", "_")}.mp3'))
+                        except:
+                            m.say(r, False)
 
                     elif 'and you' in text or 'what about you' in text:
                         r = random.choice(m.INTENTS['howdy_reponses'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
                         playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
 
-                    elif 'not funny' in text:
-                        m.say('take this ')
-                        m.joke()
                     elif 'how are you' in text or 'how do you do' in text or 'howdy' in text or 'are you fine' in text or 'are you ok' in text:
                         r = random.choice(m.INTENTS['howdy_reponses'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
@@ -778,9 +816,6 @@ if __name__ == '__main__':
                         r = random.choice(m.json_data["INFO"]["ASSISTANT"]["description"]).replace('_', ' ')
                         print(f'{m.ASS_NAME} : {r}')
                         playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
-
-                    elif 'refresh' in text or 'reload' in text or 'rebuild' in text :
-                        m.refresh()
 
                 # except sr.WaitTimeoutError as e:
                 #     print("Timeout; {0}".format(e))
