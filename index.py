@@ -161,9 +161,10 @@ class Main:
         ext = ['mp3', 'mpeg']
         self.music_tracks = []
         for dir in dirs:
-            for root, dirs_, f1 in os.walk(f'/home/{getpass.getuser()}/{dir}/'):
+            for root, dirs_, f1 in os.walk(os.path.join(os.path.expanduser('~'), dir)):
                 for f_ in f1:
-                    if f_.split('.')[-1] in ext and f_.split('.')[-1] not in current_files:
+                    ff = str(f_).split('/')[-1].split(f'.{str(f_.split(".")[-1])}')[0]
+                    if str(f_.split(".")[-1]) in ext and ff not in current_files:
                         self.music_tracks.append(os.path.join(root, f_))
 
         sys.stdout.write('\x1b[1A')
@@ -177,11 +178,19 @@ class Main:
 
         hour = int(datetime.datetime.now().hour)
         if hour >= 0 and hour < 12:
-            greeting.pop(greeting.index("good morning"))
-        elif hour >= 12 and hour < 18:
+            # greeting.pop(greeting.index("good morning"))
             greeting.pop(greeting.index("good afternoon"))
+            greeting.pop(greeting.index("Good Evening"))
+
+        elif hour >= 12 and hour < 18:
+            # greeting.pop(greeting.index("good afternoon"))
+            greeting.pop(greeting.index("good morning"))
+            greeting.pop(greeting.index("Good Evening"))
+
         else:
-            greeting.pop(greeting.index("good Evening"))
+            greeting.pop(greeting.index("good afternoon"))
+            greeting.pop(greeting.index("good morning"))
+            # greeting.pop(greeting.index("Good Evening"))
 
 
 
@@ -209,8 +218,8 @@ class Main:
 
         print(f"{self.ASS_NAME} : {greet.replace('_', ' ')}, {g2.replace('_', ' ')}")
 
-        playsound(os.path.join(self.aud_dir, f"{greet}.mp3"))
-        playsound(os.path.join(self.aud_dir, f"{g2}.mp3"))
+        playsound(os.path.join(self.aud_dir, f"{greet.replace(' ', '_')}.mp3"))
+        playsound(os.path.join(self.aud_dir, f"{g2.replace(' ', '_')}.mp3"))
 
     def get_gender(self, n):
         name_ = str(n).capitalize()
@@ -361,7 +370,7 @@ class Main:
 
         return frommail
 
-    def sendEmail(self):  # TODO : add contact list
+    def sendEmail(self):
         self.say('creating mail,')
         tomail = input('send mail to : ')
         msg = ''
@@ -420,7 +429,7 @@ class Main:
             self.brower = webdriver.Chrome(executable_path=path.join(path.dirname(__file__), "src/chromedriver.exe"))
         else:
             self.brower = webdriver.Chrome(executable_path=path.join(path.dirname(__file__), "src/chromedriver"))
-        if self.json_data['links'][url] or len(url.split('.')) > 1:
+        if self.json_data['links'][url]:
             self.brower.get(url)
             return
         self.google_serch(url)
@@ -428,8 +437,14 @@ class Main:
     def google_serch(self, key):
         key = key.replace('google', '').replace('alex', '').replace('hey', '').replace('hello', '')
         self.say(f'searching on google')
-        self.open_url('http://www.google.com')
+        # self.open_url('http://www.google.com')
+        if platform.system() == 'Windows':
+            self.brower = webdriver.Chrome(executable_path=path.join(path.dirname(__file__), "src/chromedriver.exe"))
+        else:
+            self.brower = webdriver.Chrome(executable_path=path.join(path.dirname(__file__), "src/chromedriver"))
 
+        self.brower.get('http://www.google.com')
+        self.brower.maximize_window()
         search = self.brower.find_element_by_name('q')
         search.send_keys(key)
         search.send_keys(Keys.RETURN)
@@ -543,18 +558,18 @@ class Main:
     def take_pic(self):
 
         now = datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
-        pic_name = f"{self.PATH}/alex_pic_{now}.jpg"
+        pic_name = os.path.join(self.PATH, f'alex_pic_{now}.jpg')
         pygame.camera.init()
-        pygame.camera.list_cameras()
-        cam = pygame.camera.Camera("/dev/video0", (640, 480))
+        cams = pygame.camera.list_cameras()
+        cam = pygame.camera.Camera(cams[0], (640, 480))
         cam.start()
         time.sleep(0.1)
         img = cam.get_image()
         pygame.image.save(img, pic_name)
         cam.stop()
 
-        img = Image.open(pic_name)
-        img.show()
+        img_ = Image.open(pic_name)
+        img_.show()
 
     def take_note(self):
         now = datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
@@ -713,10 +728,10 @@ if __name__ == '__main__':
                         elif 'music' in query:
                             m.music(query)
 
-                        elif ('take' in query or 'get' in query) and ('picture' in query or 'photo' in query):
-                            [playsound(os.path.join(m.aud_dir, f'{i}.mp3')) for i in [3, 2, 1]]
-                            m.take_pic() #todo bug here
-                            vlc.MediaPlayer(os.path.join(m.aud_dir, 'pic.mp3')).play()
+                        elif ('take' in query or 'get' in query) and ('picture' in query or 'pictures' in query or 'photo' in query):
+                            [playsound(os.path.join('./aud', f'{i}.mp3')) for i in [3, 2, 1]]
+                            m.take_pic()
+                            vlc.MediaPlayer(os.path.join('./aud', 'pic.mp3')).play()
 
                         elif 'take' in query and 'note' in query:
                             m.take_note()
