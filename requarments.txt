@@ -27,6 +27,7 @@ opencv-python==4.2.0.34
 Pillow==7.1.2
 playsound==1.2.2
 PyAudio==0.2.11
+pygobject==3.36.1
 pygame==1.9.6
 pyjokes==0.6.0
 selenium==3.141.0
