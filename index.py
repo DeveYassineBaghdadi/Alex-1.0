@@ -82,12 +82,15 @@ class Main:
         self.music_played = False
         self.lang = 'en-us'
         self.refresh()
-
         # self.vlc_instance = vlc.Instance()
         # self.player = self.vlc_instance.media_player_new()
 
-    def refresh(self):
+    def validFN(self, x):
+        return x.replace('<', '').replace(' ', '_').replace('>', '').replace(':', '').replace('"', '').replace('/', '').replace('|', '').replace('?', '').replace('*', '')#:"/\|?*
+
+    def splash(self):
         try:
+
             print('\x1b[8;36;106t')  # resize terminal window
             time.sleep(0.5)
             doit()
@@ -96,16 +99,19 @@ class Main:
 
         except: pass
         print(logo)
-        print('\t\033[34m\033[1mcollecting data ...\033[0m')
+
+    def refresh(self):
+        if str(platform.system()).lower() != 'windows': self.splash()
+        print(f'\t\t\t\t\t\033[34m\033[1mcollecting data ...\033[0m')
 
         self.json_data = json.loads(open('intents.json').read())
         self.INTENTS = self.json_data['INTENTS']
         self.ASS_NAME = str(self.json_data['INFO']['ASSISTANT']['name']).capitalize()
         self.USER = f"{self.get_gender(str(self.json_data['INFO']['USER']['name']))} {str(self.json_data['INFO']['USER']['name'])}"
 
-        tts = gTTS(self.USER, lang=self.lang)
-        fn = "aud/username.mp3"
-        tts.save(fn)
+        # tts = gTTS(self.USER, lang=self.lang)
+        # fn = "aud/username.mp3"
+        # tts.save(fn)
 
         desktop = os.path.join(os.path.expanduser('~'), 'Desktop')
         self.PATH = os.path.join(desktop, 'Alex_data')
@@ -120,11 +126,13 @@ class Main:
         current_files = [str(f).replace('.mp3', '') for f in os.listdir(self.aud_dir) if os.path.isfile(os.path.join(self.aud_dir, f))]
         to_tts = []
         for i in self.INTENTS:
-            for x in self.INTENTS[i]:
-                    if x.replace(' ', '_') not in current_files:
-                        f = str(x).replace(' ', '_')
-                        # gTTS(x.replace('_', ' '), lang=self.lang).save(os.path.join(self.aud_dir, f'{f}.mp3'))
-                        to_tts.append(str(os.path.join(self.aud_dir, f'{f}.mp3')))
+            if i != 'commands':
+                for x in self.INTENTS[i]:
+                        if self.validFN(x) not in current_files:
+                            f = str(x).replace(' ', '_')
+                            # gTTS(x.replace('_', ' '), lang=self.lang).save(os.path.join(self.aud_dir, f'{f}.mp3'))
+
+                            to_tts.append(str(os.path.join(self.aud_dir, f'{self.validFN(f)}.mp3')))
         exceptions = [
             "just the first name please",
             "say What should i write in it after the beep",
@@ -142,19 +150,19 @@ class Main:
 
         ]
         for i in exceptions:
-            if i.replace(' ', '_') not in current_files:
+            if self.validFN(i) not in current_files:
                 # ttc = gTTS(i.replace('_', ' '), "en-us")
                 i = str(i).replace(' ', '_')
                 # ttc.save(os.path.join(self.aud_dir, f"{i}.mp3"))
-                to_tts.append(str(os.path.join(self.aud_dir, f'{i}.mp3')))
+                to_tts.append(str(os.path.join(self.aud_dir, f'{self.validFN(i)}.mp3')))
 
         for i in self.json_data['INFO']['ASSISTANT']['description']:
-            if i.replace(' ', '_') not in current_files:
+            if self.validFN(i) not in current_files:
                 i = str(i).replace(' ', '_')
-                to_tts.append(str(os.path.join(self.aud_dir, f'{i}.mp3')))
+                to_tts.append(str(os.path.join(self.aud_dir, f'{self.validFN(i)}.mp3')))
 
         for t in to_tts:
-            gTTS(t.split('/')[-1].replace('_', ' ').replace('.mp3', ''), lang=self.lang).save(t)
+            gTTS(os.path.basename(t).replace('.mp3', '').replace('_', ' '), lang=self.lang).save(t)
 
 
         dirs = ['Desktop', 'Documents', 'Downloads', 'Pictures', 'Videos', 'Music']
@@ -195,7 +203,7 @@ class Main:
 
 
         if not self.USER:
-            playsound(f'{self.aud_dir}/{random.choice(self.INTENTS["get_user_name_Q"].replace(" ", "_"))}.mp3')
+            playsound(f'{self.aud_dir}/{self.validFN(random.choice(self.INTENTS["get_user_name_Q"]))}.mp3')
             while True:
                 name = self.listen_(False)
                 if name and len(name.split(' ')) == 1:
@@ -208,18 +216,18 @@ class Main:
 
                     self.refresh()
                     self.say(f'{random.choice(["nice to meet you ", "its great to meet you ", "its pleasure to meet you ", "am glad to meet you"])} {self.USER}, please say "alex" for start listen to you .')
-                    playsound(f'{self.aud_dir}/{random.choice(self.INTENTS["give_help"].replace(" ", "_"))}.mp3')
+                    playsound(os.path.join(self.aud_dir, f'{self.validFN(random.choice(self.INTENTS["give_help"]))}.mp3'))
                     return
                 else:
-                    playsound(f"{self.aud_dir}/just_the_first_name_please.mp3")
+                    playsound(os.path.join(self.aud_dir, f"{self.validFN('just_the_first_name_please')}.mp3"))
 
         greet = random.choice(greeting)
         g2 = random.choice(self.INTENTS['give_help'])
 
         print(f"{self.ASS_NAME} : {greet.replace('_', ' ')}, {g2.replace('_', ' ')}")
 
-        playsound(os.path.join(self.aud_dir, f"{greet.replace(' ', '_')}.mp3"))
-        playsound(os.path.join(self.aud_dir, f"{g2.replace(' ', '_')}.mp3"))
+        playsound(os.path.join(self.aud_dir, f"{self.validFN(greet)}.mp3"))
+        playsound(os.path.join(self.aud_dir, f"{self.validFN(g2)}.mp3"))
 
     def get_gender(self, n):
         name_ = str(n).capitalize()
@@ -333,7 +341,7 @@ class Main:
                 sys.stdout.write('\x1b[2K')
                 s = random.choice(self.INTENTS['UNDERSTAND_ESSUE'])
                 print('', end='')
-                playsound(f'aud/{s}.mp3')
+                playsound(f'aud/{self.validFN(s)}.mp3')
 
             except Exception as e:
                 print(f'ERROR in listening function: {e}')
@@ -574,9 +582,9 @@ class Main:
     def take_note(self):
         now = datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')
         # self.say("say What should i write in it after the beep")
-        playsound(random.choice([f'{self.aud_dir}/say_What_you_want_to_write_in_it_after_the_beep.mp3',
-                                 f'{self.aud_dir}/say_What_should_i_write_in_it_after_the_beep.mp3']))
-        playsound(f'{self.aud_dir}/beep.aif')
+        playsound(random.choice([os.path.join(self.aud_dir, f'{self.validFN("say_What_you_want_to_write_in_it_after_the_beep")}.mp3'),
+                                 os.path.join(self.aud_dir, f'{self.validFN("say_What_should_i_write_in_it_after_the_beep")}.mp3')]))
+        playsound(f'aud/beep.aif')
         # self.player = vlc.MediaPlayer('beep.aif')
         # self.player.play()
 
@@ -586,19 +594,19 @@ class Main:
             return
         file = os.path.join(self.PATH, f"alex_note_{now}.txt")
         with open(file, 'w') as f:
-            f.write(f'-{now} : \n{note} .')
+            f.write(f'{note} .')
 
-        vlc.MediaPlayer(f"{self.aud_dir}/{'your note created successfully'.replace(' ', '_')}.mp3").play()
+        vlc.MediaPlayer(os.path.join(self.aud_dir, f"{self.validFN('your note created successfully')}.mp3")).play()
         webbrowser.open(file)
 
     def send_SMS(self):
         # self.say('to who ?')
-        vlc.MediaPlayer(os.path.join(self.aud_dir, "to who ?.mp3".replace(' ', '_'))).play()
+        vlc.MediaPlayer(os.path.join(self.aud_dir, f"{self.validFN('to who ?')}.mp3")).play()
 
         to = str(input('send SMS to : '))
 
         self.say('what you want to send ?')
-        vlc.MediaPlayer(os.path.join(self.aud_dir, "what you want to send ?.mp3".replace(' ', '_'))).play()
+        vlc.MediaPlayer(os.path.join(self.aud_dir, f"{self.validFN('what you want to send ?')}.mp3")).play()
 
         msg = self.listen_()
         account_sid = 'AC5fb41b8756e48118cc8db0c019bfc43d'
@@ -617,7 +625,7 @@ class Main:
         langs = googletrans.LANGCODES
         while True:
 
-            playsound(os.path.join(self.aud_dir, 'translate_from_english_to_what_?.mp3'.replace(' ', '_')))
+            playsound(os.path.join(self.aud_dir, f'{self.validFN("translate_from_english_to_what_?")}.mp3'))
             a = self.listen_()
             try:
                 l = langs[a]
@@ -628,8 +636,8 @@ class Main:
 
         txt = ''
         while not txt:
-            playsound(os.path.join(self.aud_dir, 'plaese_start_talking_after_the_beep.mp3'.replace(' ', '_')))
-            playsound(os.path.join(self.aud_dir, 'beep.aif'))
+            playsound(os.path.join(self.aud_dir, f'{self.validFN("plaese_start_talking_after_the_beep")}.mp3'))
+            playsound(os.path.join(os.getcwd(), 'aud', 'beep.aif'))
             txt = self.listen_()
         try:
             nTxt = trs.translate(text=txt, dest=l, src='en')
@@ -649,8 +657,8 @@ class Main:
 if __name__ == '__main__':
 
     # todo json intents : "GREETING_first_time, GREETING, GOOD_BYE, UNDERSTAND_ESSUE, THANK"
+    m = Main()
     try:
-        m = Main()
         while True:
             r = sr.Recognizer()
             with sr.Microphone() as source:
@@ -667,13 +675,13 @@ if __name__ == '__main__':
                             m.wplayer.stop()
                         except: pass
 
-                        wake = random.choice(m.INTENTS['wake']).replace(' ', '_')
+                        wake = random.choice(m.INTENTS['wake'])
                         print(f"{m.ASS_NAME} : {str(wake).replace('_', ' ')}\n")
-                        playsound(os.path.join(m.aud_dir, f"{wake}.mp3"))
+                        playsound(os.path.join(m.aud_dir, f"{m.validFN(wake)}.mp3"))
                         query = m.listen_()
 
                         if ('what i have' in query or 'my events' in query):
-                            playsound(os.path.join(m.aud_dir, 'i_have_some_issues_on_this_part,_please_try_to_solve_them.mp3'.replace(' ', '_')))
+                            playsound(os.path.join(m.aud_dir, f'{m.validFN("i_have_some_issues_on_this_part,_please_try_to_solve_them")}.mp3'))
                             # s = m.google_auth()
                             # m.get_events(m.get_date(query), s)
 
@@ -683,9 +691,9 @@ if __name__ == '__main__':
                             m.sendEmail()
 
                         elif 'search' in query:
-                            r = random.choice(m.INTENTS['search']).replace(' ', '_')
+                            r = random.choice(m.INTENTS['search'])
                             print(f"{m.ASS_NAME} : {str(r).replace('_', ' ')}")
-                            playsound(os.path.join(m.aud_dir, f"{r}.mp3"))
+                            playsound(os.path.join(m.aud_dir, f"{m.validFN(r)}.mp3"))
                             q = m.listen_()
                             # q = q.replace('search', '').replace('what\'s', '').replace('which', '').replace(
                             #     'what', '').replace('why', '').replace('how', '').replace('who', '').replace('where',
@@ -695,7 +703,7 @@ if __name__ == '__main__':
                                 try:
                                     m.wikipedia_search(q)
                                 except:
-                                    vlc.MediaPlayer(os.path.join(m.aud_dir, 'Unfortunately_i_did_not_get_a_proved_answer_from_wikipedia,_i_will_try_on_google_search.mp3'.replace(' ', '_'))).play()
+                                    vlc.MediaPlayer(os.path.join(m.aud_dir, f'{m.validFN("Unfortunately_i_did_not_get_a_proved_answer_from_wikipedia,_i_will_try_on_google_search")}.mp3')).play()
                                     m.google_serch(q)
                             else: m.google_serch(q)
 
@@ -729,9 +737,10 @@ if __name__ == '__main__':
                             m.music(query)
 
                         elif ('take' in query or 'get' in query) and ('picture' in query or 'pictures' in query or 'photo' in query):
-                            [playsound(os.path.join('./aud', f'{i}.mp3')) for i in [3, 2, 1]]
+                            print("taking a picture")
+                            [playsound(os.path.join(os.getcwd(), 'aud', f'{m.validFN(str(i))}.mp3')) for i in [3, 2, 1]]
                             m.take_pic()
-                            vlc.MediaPlayer(os.path.join('./aud', 'pic.mp3')).play()
+                            vlc.MediaPlayer(os.path.join(os.getcwd(), 'aud', 'pic.mp3')).play()
 
                         elif 'take' in query and 'note' in query:
                             m.take_note()
@@ -740,7 +749,7 @@ if __name__ == '__main__':
                             m.send_SMS()
 
                         elif 'exit' in query or 'bye' in query or 'goodbye' in query or 'stop' in query:
-                            playsound(os.path.join(m.aud_dir, f"{random.choice(m.INTENTS['GOOD_BYE'])}.mp3"))
+                            playsound(os.path.join(m.aud_dir, f"{m.validFN(random.choice(m.INTENTS['GOOD_BYE']))}.mp3"))
                             os.system(clear)
                             doit()
                             print(logo)
@@ -784,8 +793,7 @@ if __name__ == '__main__':
                             m.say(f'i can help you with {len(commands)} operations so far :')
                             for x in commands:
                                 print(f'\t#\t{x.capitalize()} \033[5m==>\033[0m {commands[x].capitalize()} .\n')
-
-                                m.say(commands[x].capitalize(), False)
+                                # m.say(commands[x].capitalize(), False)
                             print()
 
                             m.say('just say alex and i will be there for you', False)
@@ -798,7 +806,7 @@ if __name__ == '__main__':
                         elif 'created you' in query or 'made you' in query or 'maker name' in query or 'your father' in query:
                             r = random.choice(m.INTENTS['made_reponses'])
                             print(f'{m.ASS_NAME} : {r} .')
-                            playsound(os.path.join(m.aud_dir, f'{r.replace(" ", "_")}.mp3'))
+                            playsound(os.path.join(m.aud_dir, f'{m.validFN(r)}.mp3'))
 
 
                         elif 'not funny' in query:
@@ -813,24 +821,24 @@ if __name__ == '__main__':
                         r = random.choice(m.INTENTS['GREETING'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
                         try:
-                            playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
+                            playsound(os.path.join(m.aud_dir, f"{m.validFN(r)}.mp3"))
                         except:
                             m.say(r, False)
 
                     elif 'and you' in text or 'what about you' in text:
                         r = random.choice(m.INTENTS['howdy_reponses'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
-                        playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
+                        playsound(os.path.join(m.aud_dir, f"{m.validFN(r)}.mp3"))
 
                     elif 'how are you' in text or 'how do you do' in text or 'howdy' in text or 'are you fine' in text or 'are you ok' in text:
                         r = random.choice(m.INTENTS['howdy_reponses'])
                         print(f'{m.ASS_NAME} : {r.replace("_", " ")}')
-                        playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
+                        playsound(os.path.join(m.aud_dir, f"{m.validFN(r)}.mp3"))
 
                     elif 'who are you' in text or 'about you' in text or 'your name' in text:
                         r = random.choice(m.json_data["INFO"]["ASSISTANT"]["description"]).replace('_', ' ')
                         print(f'{m.ASS_NAME} : {r}')
-                        playsound(os.path.join(m.aud_dir, f"{r.replace(' ', '_')}.mp3"))
+                        playsound(os.path.join(m.aud_dir, f"{m.validFN(r)}.mp3"))
 
                 # except sr.WaitTimeoutError as e:
                 #     print("Timeout; {0}".format(e))
@@ -841,11 +849,7 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print('\nexit ...')
-        # playsound(f"aud/{random.choice(m.INTENTS['GOOD_BYE'])}.mp3")
-        doit()
-        os.system(clear)
-        print('\033c')
-        print(logo)
+        if str(platform.system()).lower() != 'windows': m.splash()
 
     # except Exception as e:
     #     print(f'{e}\nExiting ...')

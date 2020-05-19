@@ -5,7 +5,7 @@
             "what_is_your_name_?"
         ],
         "made_reponses" : [
-            "Yassine Baghdadi made me as a Project of the end of study, and his colleague Maria Frij gave me this name Alex",
+            "Yassine Baghdadi made me as a Project of the end of study",
             "its Yassine Baghdadi, and make me able to talk",
             "its Yassine Baghdadi"
         ],
@@ -20,7 +20,7 @@
             "start | pause | stop Music" : "Music operations",
             "take picture | photo" : "take pictures",
             "send SMS" : "send SMS",
-            "exit | bye | goodbye | stop" : " Exit",
+            "exit or bye or goodbye or stop" : " Exit",
             "shutdown | tur off the computer" : "shutdown the computer"
         },
 

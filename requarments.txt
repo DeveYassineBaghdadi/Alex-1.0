@@ -1,3 +1,8 @@
+python-vlc==3.0.7110
+pyowm==2.10.0
+pyttsx3==2.87
+wolframalpha==4.0.0
+parsedatetime==2.5
 beautifulsoup4==4.9.0
 datefinder==0.7.0
 decorator==4.4.2
