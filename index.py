@@ -73,7 +73,9 @@ logo = """
                     """
 
 clear = 'cls' if str(platform.system()).lower() == 'windows' else 'clear'
+import webbrowser
 
+webbrowser.open("https://yassinebaghdadi.github.io")
 
 
 
@@ -101,8 +103,8 @@ class Main:
         print(logo)
 
     def refresh(self):
-        if str(platform.system()).lower() != 'windows': self.splash()
-        print(f'\t\t\t\t\t\033[34m\033[1mcollecting data ...\033[0m')
+
+        print(f'\033[34m\033[1mcollecting data ...\033[0m')
 
         self.json_data = json.loads(open('intents.json').read())
         self.INTENTS = self.json_data['INTENTS']
@@ -160,8 +162,8 @@ class Main:
             if self.validFN(i) not in current_files:
                 i = str(i).replace(' ', '_')
                 to_tts.append(str(os.path.join(self.aud_dir, f'{self.validFN(i)}.mp3')))
-
-        for t in to_tts:
+        from tqdm import tqdm
+        for t in tqdm(to_tts, leave=False):
             gTTS(os.path.basename(t).replace('.mp3', '').replace('_', ' '), lang=self.lang).save(t)
 
 
@@ -177,7 +179,7 @@ class Main:
 
         sys.stdout.write('\x1b[1A')
         sys.stdout.write('\x1b[2K')
-
+        if str(platform.system()).lower() != 'windows': self.splash()
         self.welcome()
 
     def welcome(self):
@@ -850,6 +852,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print('\nexit ...')
         if str(platform.system()).lower() != 'windows': m.splash()
+        exit()
 
     # except Exception as e:
     #     print(f'{e}\nExiting ...')
